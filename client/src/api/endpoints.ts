@@ -25,6 +25,10 @@ export const authApi = {
     const res = await api.post<{ success: boolean; data: { user: User } }>('/auth/register', data);
     return res.data.data.user;
   },
+  googleLogin: async (credential: string) => {
+    const res = await api.post<{ success: boolean; data: { user: User } }>('/auth/google', { credential });
+    return res.data.data.user;
+  },
   logout: async () => {
     await api.post('/auth/logout');
   },

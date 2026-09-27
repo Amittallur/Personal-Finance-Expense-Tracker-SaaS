@@ -149,11 +149,91 @@ const changePassword = async (req, res, next) => {
   }
 };
 
+// @desc    Google SSO Login / Register
+// @route   POST /api/auth/google
+// @access  Public
+const googleAuth = async (req, res, next) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: 'Google ID token credential is required',
+      });
+    }
+
+    const { OAuth2Client } = require('google-auth-library');
+    const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+    // Verify token with Google
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid Google authentication token payload',
+      });
+    }
+
+    const { email, name, sub: googleId, picture } = payload;
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+
+    if (user) {
+      let isModified = false;
+      if (!user.googleId) {
+        user.googleId = googleId;
+        isModified = true;
+      }
+      if (picture && (!user.avatar || user.avatar === '')) {
+        user.avatar = picture;
+        isModified = true;
+      }
+      if (isModified) {
+        await user.save();
+      }
+      return sendTokenResponse(user, 200, res, 'Logged in with Google successfully');
+    }
+
+    // Otherwise create a new Google-authenticated user
+    user = await User.create({
+      name: name || email.split('@')[0],
+      email: email.toLowerCase(),
+      authProvider: 'google',
+      googleId,
+      avatar: picture || '',
+      preferences: {
+        currency: 'INR',
+        theme: 'light',
+        dateFormat: 'DD/MM/YYYY',
+      },
+    });
+
+    // Initialize default categories for new user
+    await createDefaultCategories(user._id);
+
+    sendTokenResponse(user, 201, res, 'Welcome to Centra! Account created via Google');
+  } catch (err) {
+    console.error('Google Auth Error:', err);
+    res.status(401).json({
+      success: false,
+      message: 'Google authentication failed: ' + (err.message || 'Invalid token'),
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
+  googleAuth,
   logout,
   getMe,
   updateProfile,
   changePassword,
 };
+

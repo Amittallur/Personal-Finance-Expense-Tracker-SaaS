@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './context/AuthContext';
 import { ColorModeProvider } from './context/ColorModeContext';
 import { ToastProvider } from './context/ToastContext';
@@ -17,22 +18,27 @@ const queryClient = new QueryClient({
   },
 });
 
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
 export const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ColorModeProvider>
-          <ToastProvider>
-            <BrowserRouter>
-              <ShortcutProvider>
-                <AppRoutes />
-              </ShortcutProvider>
-            </BrowserRouter>
-          </ToastProvider>
-        </ColorModeProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ColorModeProvider>
+            <ToastProvider>
+              <BrowserRouter>
+                <ShortcutProvider>
+                  <AppRoutes />
+                </ShortcutProvider>
+              </BrowserRouter>
+            </ToastProvider>
+          </ColorModeProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   );
 };
 
 export default App;
+

@@ -220,6 +220,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onMobileMenuToggle }) => {
                   aria-label="User profile"
                 >
                   <Avatar
+                    src={user?.avatar}
                     name={user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
                     size="sm"
                     className="w-7 h-7 text-xs font-semibold bg-primary-600 text-white"

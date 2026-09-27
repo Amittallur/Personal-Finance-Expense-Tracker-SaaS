@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import { Mail, Lock, Eye, EyeOff, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { GoogleSignInButton } from '../components/GoogleSignInButton';
 
 const loginSchema = Yup.object({
   email: Yup.string().email('Please enter a valid email').required('Email is required'),
@@ -73,6 +74,11 @@ export const LoginPage: React.FC = () => {
             <p className="text-xs text-foreground-500 mt-1">
               Sign in to your Centra financial dashboard
             </p>
+          </div>
+
+          {/* Google SSO Button */}
+          <div className="mb-3">
+            <GoogleSignInButton text="continue_with" />
           </div>
 
           {/* Quick Demo Login Banner */}

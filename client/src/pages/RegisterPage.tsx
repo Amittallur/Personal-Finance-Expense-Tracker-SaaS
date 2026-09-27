@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import { User, Mail, Lock, Eye, EyeOff, UserPlus, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { GoogleSignInButton } from '../components/GoogleSignInButton';
 
 const registerSchema = Yup.object({
   name: Yup.string().trim().required('Full name is required').max(60, 'Name too long'),
@@ -61,6 +62,19 @@ export const RegisterPage: React.FC = () => {
             <p className="text-xs text-foreground-500 mt-1">
               Start tracking, budgeting, and optimizing your wealth today
             </p>
+          </div>
+
+          {/* Google SSO Button */}
+          <div className="mb-4">
+            <GoogleSignInButton text="signup_with" />
+          </div>
+
+          <div className="relative flex py-2 items-center mb-4">
+            <div className="flex-grow border-t border-border"></div>
+            <span className="flex-shrink mx-3 text-[11px] font-medium text-foreground-400 uppercase tracking-wider">
+              Or register with email
+            </span>
+            <div className="flex-grow border-t border-border"></div>
           </div>
 
           {errorMsg && (
